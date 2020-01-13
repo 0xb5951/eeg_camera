@@ -2,7 +2,7 @@ import re
 import thinkgear as tg
 
 PORT = '/dev/rfcomm1'
-AT_THRESHOLD = 5
+AT_THRESHOLD = 20
 
 def check_method(terget):
     print type(terget)
