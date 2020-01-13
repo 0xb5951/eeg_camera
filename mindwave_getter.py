@@ -11,19 +11,30 @@ def check_method(terget):
 
 
 def check_attention(pkt_t):
+    flag = False
     if pkt_t != '' and "ATTENTION" in pkt_t:
         at_num = re.search(r'\d+', pkt_t)
         print at_num.group()
         if AT_THRESHOLD >= int(at_num.group()):
-            print 'kacha'
+            flag = True
+            
+    return flag
+
 
 if __name__ == "__main__":
     # check_method(thinkgear)
     mindwave_obj = tg.ThinkGearProtocol(PORT)
+    shatter_flag = 0
 
     for packets in mindwave_obj.get_packets():
         for pkt in packets:
             if isinstance(pkt, tg.ThinkGearRawWaveData):
                 continue
 
-            check_attention(str(pkt))
+            if check_attention(str(pkt)) and shatter_flag == 0:
+                print 'kacha'
+                shatter_flag = 1
+                # ここで写真取る
+            else:
+                shatter_flag = 0
+                
