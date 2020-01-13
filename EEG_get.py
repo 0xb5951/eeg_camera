@@ -1,5 +1,5 @@
 import re
-import thinkgear
+import thinkgear as tg
 
 PORT = '/dev/rfcomm1'
 
@@ -10,15 +10,14 @@ def check_method(terget):
 
 if __name__ == "__main__":
     # check_method(thinkgear)
-    for packets in thinkgear.ThinkGearProtocol(PORT).get_packets():
+    mindwave_obj = tg.ThinkGearProtocol(PORT)
+
+    for packets in mindwave_obj.get_packets():
         for pkt in packets:
-            if isinstance(pkt, thinkgear.ThinkGearRawWaveData):
+            if isinstance(pkt, tg.ThinkGearRawWaveData):
                 continue
 
-            t = str(pkt)
-            # print t
-
-            if t != '':
-                if "ATTENTION" in t:
-                    at_num = re.search(r'\d+', t)
+            pkt_t = str(pkt)
+            if pkt_t != '' and "ATTENTION" in pkt_t:
+                    at_num = re.search(r'\d+', pkt_t)
                     print at_num.group()
