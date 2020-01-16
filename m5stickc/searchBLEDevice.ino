@@ -69,13 +69,20 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
 
 void setup()
 {
+    // Initialize the M5StickC object
+    M5.begin();
+    // 6軸センサ初期化
+    M5.MPU6886.Init();
+    M5.Lcd.setRotation(1); // ボタンBが上になる向き
+    M5.Lcd.fillScreen(BLACK);
+
     Serial.begin(115200);
     Serial.println("BLEデバイス検索開始...");
 
     // デバイスの初期化
     BLEDevice::init("");
     BLEScan *pBLEScan = BLEDevice::getScan(); // スキャンオブジェクトを取得
-    pBLEScan->setActiveScan(false); // パッシブスキャンを設定
+    pBLEScan->setActiveScan(false);           // パッシブスキャンを設定
     pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
     pBLEScan->setInterval(1349);
     pBLEScan->setWindow(449);
@@ -88,6 +95,6 @@ void loop()
     {
         connectToServer();
     }
-
+    M5.Lcd.printf("Loop process");
     delay(1000);
 }
