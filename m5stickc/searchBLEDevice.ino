@@ -1,9 +1,8 @@
 #include <M5StickC.h>
 #include "BLEDevice.h"
-#include "Ambient.h"
 
 // 検索するBLEデバイス。serviceUUIDを調べる場合には空にする(例はHuman Interface Device"00001812-0000-1000-8000-00805f9b34fb")
-static BLEUUID serviceUUID();
+static BLEUUID serviceUUID("");
 
 static BLEAdvertisedDevice *myDevice;
 
@@ -75,11 +74,11 @@ void setup()
 
     // デバイスの初期化
     BLEDevice::init("");
-    BLEScan *pBLEScan = BLEDevice::getScan();
+    BLEScan *pBLEScan = BLEDevice::getScan(); // スキャンオブジェクトを取得
+    pBLEScan->setActiveScan(false); // パッシブスキャンを設定
     pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
     pBLEScan->setInterval(1349);
     pBLEScan->setWindow(449);
-    pBLEScan->setActiveScan(true);
     pBLEScan->start(5, false);
 }
 
