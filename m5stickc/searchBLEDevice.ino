@@ -3,12 +3,14 @@
 
 // 検索するBLEデバイス。serviceUUIDを調べる場合には空にする(例はHuman Interface Device"00001812-0000-1000-8000-00805f9b34fb")
 static BLEUUID serviceUUID("");
+static BLEAddress *deviceMacAddres;
 
 static BLEAdvertisedDevice *myDevice;
+BLEScan *pBLEScan;
 
 // 接続してCharacteristic一覧を取得
-bool connectToServer()
-{
+bool searchBleDevice() {
+
     Serial.print("接続先 : ");
     Serial.println(myDevice->getAddress().toString().c_str());
     BLEClient *pClient = BLEDevice::createClient();
@@ -50,6 +52,24 @@ bool connectToServer()
         delay(1000);
 }
 
+// マニュファクチャラーデータを元にBLEデバイスに接続する
+void connectBleDevice()
+{
+    BLEScanResults foundDevices = pBLEScan->start(3); //スキャンを開始
+    int count = foundDevices.getCount();              // スキャンで見つけたデバイス数を取得
+
+    for (int i = 0; i < count; i++)
+    {
+        BLEAdvertisedDevice d = foundDevices.getDevice(i); // デバイスの情報をそれぞれ取得
+        if (d.haveManufacturerData())
+        {                                               // マニュファクチャラデータを持っていれば
+            std::string data = d.getManufacturerData(); // マニュファクチャラデータを取得
+            int manu = data[1] << 8 | data[0];
+            Serial.println(manu);
+        }
+    }
+}
+
 // 検索したデバイスを受信するコールバック関数
 class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
 {
@@ -57,6 +77,7 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
     {
         Serial.print("BLE デバイス発見 : ");
         Serial.println(advertisedDevice.toString().c_str());
+        Serial.println(advertisedDevice.getManufacturerData().c_str());
 
         if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(serviceUUID))
         {
@@ -81,8 +102,8 @@ void setup()
 
     // デバイスの初期化
     BLEDevice::init("");
-    BLEScan *pBLEScan = BLEDevice::getScan(); // スキャンオブジェクトを取得
-    pBLEScan->setActiveScan(false);           // パッシブスキャンを設定
+    pBLEScan = BLEDevice::getScan(); // スキャンオブジェクトを取得
+    pBLEScan->setActiveScan(false);  // パッシブスキャンを設定
     pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
     pBLEScan->setInterval(1349);
     pBLEScan->setWindow(449);
@@ -91,10 +112,10 @@ void setup()
 
 void loop()
 {
-    if (myDevice != NULL)
-    {
-        connectToServer();
-    }
+    // if (myDevice != NULL)
+    // {
+    // searchBleDevice();
+    // }
     M5.Lcd.printf("Loop process");
     delay(1000);
 }
