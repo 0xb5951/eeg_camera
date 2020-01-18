@@ -1,15 +1,19 @@
 #include <M5StickC.h>
 #include "BLEDevice.h"
+#include <Mindwave.h>
+
+Mindwave mindwave;
 
 // 検索するBLEデバイス。serviceUUIDを調べる場合には空にする(例はHuman Interface Device"00001812-0000-1000-8000-00805f9b34fb")
 static BLEUUID serviceUUID("");
-static BLEAddress *deviceMacAddres;
+static BLEAddress deviceMacAddress("00:81:F9:29:AE:44"); // mind waveのmac address
 
 static BLEAdvertisedDevice *myDevice;
 BLEScan *pBLEScan;
 
 // 接続してCharacteristic一覧を取得
-bool searchBleDevice() {
+bool searchBleDevice()
+{
 
     Serial.print("接続先 : ");
     Serial.println(myDevice->getAddress().toString().c_str());
@@ -20,6 +24,7 @@ bool searchBleDevice() {
     BLERemoteService *pRemoteService = pClient->getService(serviceUUID);
     if (pRemoteService == nullptr)
     {
+        Serial.print("disconnect");
         pClient->disconnect();
         return false;
     }
@@ -55,19 +60,10 @@ bool searchBleDevice() {
 // マニュファクチャラーデータを元にBLEデバイスに接続する
 void connectBleDevice()
 {
-    BLEScanResults foundDevices = pBLEScan->start(3); //スキャンを開始
-    int count = foundDevices.getCount();              // スキャンで見つけたデバイス数を取得
-
-    for (int i = 0; i < count; i++)
-    {
-        BLEAdvertisedDevice d = foundDevices.getDevice(i); // デバイスの情報をそれぞれ取得
-        if (d.haveManufacturerData())
-        {                                               // マニュファクチャラデータを持っていれば
-            std::string data = d.getManufacturerData(); // マニュファクチャラデータを取得
-            int manu = data[1] << 8 | data[0];
-            Serial.println(manu);
-        }
-    }
+    Serial.print("接続先 : ");
+    Serial.println(myDevice->getAddress().toString().c_str());
+    BLEClient *pClient = BLEDevice::createClient();
+    pClient->connect(myDevice);
 }
 
 // 検索したデバイスを受信するコールバック関数
@@ -78,8 +74,9 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
         Serial.print("BLE デバイス発見 : ");
         Serial.println(advertisedDevice.toString().c_str());
         Serial.println(advertisedDevice.getManufacturerData().c_str());
+        Serial.println(advertisedDevice.getServiceDataUUID().toString().c_str());
 
-        if (advertisedDevice.haveServiceUUID() && advertisedDevice.isAdvertisingService(serviceUUID))
+        if (deviceMacAddress.equals(advertisedDevice.getAddress()))
         {
             // 指定デバイスだったら接続する
             BLEDevice::getScan()->stop();
@@ -97,7 +94,7 @@ void setup()
     M5.Lcd.setRotation(1); // ボタンBが上になる向き
     M5.Lcd.fillScreen(BLACK);
 
-    Serial.begin(115200);
+    Serial.begin(57600);
     Serial.println("BLEデバイス検索開始...");
 
     // デバイスの初期化
@@ -108,6 +105,10 @@ void setup()
     pBLEScan->setInterval(1349);
     pBLEScan->setWindow(449);
     pBLEScan->start(5, false);
+
+    // mindwaveの監視
+    mindwave.setup();
+    mindwave.setDebug(true);
 }
 
 void loop()
@@ -116,6 +117,12 @@ void loop()
     // {
     // searchBleDevice();
     // }
-    M5.Lcd.printf("Loop process");
+    mindwave.update();
+
+    // light led if signal quality is good
+    if (mindwave.getQuality() > 50)
+    {
+        M5.Lcd.printf("connect mindwave");
+    }
     delay(1000);
 }
