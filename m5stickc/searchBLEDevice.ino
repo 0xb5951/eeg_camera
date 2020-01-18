@@ -58,12 +58,15 @@ bool searchBleDevice()
 }
 
 // マニュファクチャラーデータを元にBLEデバイスに接続する
-void connectBleDevice()
+bool connectBleDevice()
 {
     Serial.print("接続先 : ");
     Serial.println(myDevice->getAddress().toString().c_str());
     BLEClient *pClient = BLEDevice::createClient();
     pClient->connect(myDevice);
+    Serial.print("isconnected : ");
+    Serial.print(pClient->isConnected());
+    return pClient->isConnected();
 }
 
 // 検索したデバイスを受信するコールバック関数
@@ -105,6 +108,15 @@ void setup()
     pBLEScan->setInterval(1349);
     pBLEScan->setWindow(449);
     pBLEScan->start(5, false);
+    //EEGに接続する
+
+    int connectedFlag = 1;
+    while (connectedFlag)
+    {
+        if (connectBleDevice()) connectedFlag = 0;
+        delay(1000);
+    }
+
 
     // mindwaveの監視
     mindwave.setup();
@@ -113,16 +125,15 @@ void setup()
 
 void loop()
 {
-    // if (myDevice != NULL)
-    // {
-    // searchBleDevice();
-    // }
     mindwave.update();
+    Serial.print("Quarity : ");
+    Serial.println(mindwave.getQuality());
 
     // light led if signal quality is good
     if (mindwave.getQuality() > 50)
     {
-        M5.Lcd.printf("connect mindwave");
+        Serial.print("Attention : ");
+        Serial.println(mindwave.getAttention());
     }
     delay(1000);
 }
