@@ -1,4 +1,5 @@
 import bluetooth
+from time import sleep
 
 mac_address = "D8:A0:1D:51:06:D2"
 central_name = "central"
