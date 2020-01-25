@@ -1,12 +1,19 @@
+#include <M5StickC.h>
 #include "BluetoothSerial.h"
 
 BluetoothSerial SerialBT;
 
 void setup() {
-  SerialBT.begin("ESP32");
+    Serial.begin(1152000);
+    SerialBT.begin("M5StickC");
 }
 
 void loop() {
-  SerialBT.println("Hello World");
+  if (Serial.available()) {
+    SerialBT.write(Serial.read());
+  }
+  if (SerialBT.available()) {
+    Serial.write(SerialBT.read());
+  }
   delay(1000);
 }
