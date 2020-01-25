@@ -1,8 +1,5 @@
 #include <M5StickC.h>
 #include "BLEDevice.h"
-#include <Mindwave.h>
-
-Mindwave mindwave;
 
 // 検索するBLEデバイス。serviceUUIDを調べる場合には空にする(例はHuman Interface Device"00001812-0000-1000-8000-00805f9b34fb")
 static BLEUUID serviceUUID("");
@@ -10,6 +7,7 @@ static BLEAddress deviceMacAddress("00:81:F9:29:AE:44"); // mind waveのmac addr
 
 static BLEAdvertisedDevice *myDevice;
 BLEScan *pBLEScan;
+BLEClient *pClient;
 
 // 接続してCharacteristic一覧を取得
 bool searchBleDevice()
@@ -62,7 +60,7 @@ bool connectBleDevice()
 {
     Serial.print("接続先 : ");
     Serial.println(myDevice->getAddress().toString().c_str());
-    BLEClient *pClient = BLEDevice::createClient();
+    pClient = BLEDevice::createClient();
     pClient->connect(myDevice);
     Serial.print("isconnected : ");
     Serial.print(pClient->isConnected());
@@ -108,8 +106,8 @@ void setup()
     pBLEScan->setInterval(1349);
     pBLEScan->setWindow(449);
     pBLEScan->start(5, false);
+    
     //EEGに接続する
-
     int connectedFlag = 1;
     while (connectedFlag)
     {
@@ -117,23 +115,33 @@ void setup()
         delay(1000);
     }
 
-
     // mindwaveの監視
-    mindwave.setup();
-    mindwave.setDebug(true);
+    // mindwave.setup();
+    // mindwave.setDebug(true);
 }
 
 void loop()
 {
-    mindwave.update();
-    Serial.print("Quarity : ");
-    Serial.println(mindwave.getQuality());
+    // mindwave.update();
+    // Serial.print("Quarity : ");
+    // Serial.println(mindwave.getQuality());
 
-    // light led if signal quality is good
-    if (mindwave.getQuality() > 50)
-    {
-        Serial.print("Attention : ");
-        Serial.println(mindwave.getAttention());
-    }
+    // Serial.print("hasNewData : ");
+    // Serial.println(mindwave.hasNewData());
+
+    // Serial.print("isDebugging : ");
+    // Serial.println(mindwave.isDebugging());
+
+    // Serial.print("getPoorQuality : ");
+    // Serial.println(mindwave.getPoorQuality());
+
+    // // light led if signal quality is good
+    // if (mindwave.getQuality() > 50)
+    // {
+    //     Serial.print("Attention : ");
+    //     Serial.println(mindwave.getAttention());
+    // }
+    Serial.print("Attention : ");
+    Serial.println(pClient->getValue());
     delay(1000);
 }
