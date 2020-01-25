@@ -14,8 +14,16 @@ while(1):
         print mac_address + " : Successful Connected!!!"
         break
     except bluetooth.BluetoothError:
-        print self.name + " : connecting failed"
+        print mac_address + " : connecting failed"
         print "try connecting"
         sleep(1)
     except KeyboardInterrupt:
         break
+
+while 1:
+    try:
+        ble_server.send("Hello World")
+        print "data send"
+        sleep(1)
+    except KeyboardInterrupt:
+        print 
