@@ -6,8 +6,8 @@ MAC_ADDRESS = "00:81:F9:29:AE:44"
 peripheral = btle.Peripheral(MAC_ADDRESS)
 
 for service in peripheral.getServices():
-    print("UUID：{service.uuid}")
+    print("serviceUUID: " + str(service.uuid))
     for characteristic in service.getCharacteristics():
-        print('UUID：{characteristic.uuid}')
-        print('ハンドル：{characteristic.getHandle()}')
-        print('プロパティ：{characteristic.propertiesToString()}')
+        print("characteristicUUID: " + str(characteristic.uuid))
+        print("handle: " + str(characteristic.getHandle()))
+        print("property: " + characteristic.propertiesToString())
