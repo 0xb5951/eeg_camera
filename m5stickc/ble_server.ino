@@ -15,10 +15,20 @@ class MyCallbackHandler: public BLECharacteristicCallbacks {
     std::string value = pCharacteristic->getValue();
     M5.Lcd.println(value.c_str());
   }
-}
+
+};
 
 void setup()
 {
+    // Initialize the M5StickC object
+    M5.begin();
+    // 6軸センサ初期化
+    M5.MPU6886.Init();
+    M5.Lcd.setRotation(1); // ボタンBが上になる向き
+    M5.Lcd.fillScreen(BLACK);
+
+    Serial.begin(57600);
+
     // Initialize the BLE environment
     BLEDevice::init("M5StickC");
 
