@@ -15,6 +15,9 @@ def get_device_data():
             print("property: " + characteristic.propertiesToString())
 
 
+def write_characterristics(handle,text):
+    return peripheral.writeCharacteristic(handle, text, True)
+
 def read_characterristics(pointer):
     data = peripheral.readCharacteristic(pointer)
     # datas = peripheral.getCharacteristics(27,28)
@@ -28,3 +31,5 @@ if __name__ == "__main__":
     get_device_data()
     for i in range(42, 43):
         read_characterristics(i)  
+
+    write_characterristics(42, "test")
