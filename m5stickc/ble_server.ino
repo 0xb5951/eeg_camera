@@ -1,6 +1,8 @@
 #include <M5StickC.h>
 #include "BLEDevice.h"
 
+// 自由に設定してよい。以下でランダムなUUIDを生成してくれる。
+// https://www.uuidgenerator.net
 static BLEUUID ServiceUUID("012bfff1-2c92-11e3-9e06-0002a5d5c413");
 static BLEUUID CharacteristicUUID("012bfff4-2c92-11e3-9e06-0002a5d5c413");
 
@@ -15,37 +17,18 @@ class MyCallbackHandler: public BLECharacteristicCallbacks {
     std::string value = pCharacteristic->getValue();
     M5.Lcd.println(value.c_str());
   }
-
 };
 
-void setup()
-{
-    // Initialize the M5StickC object
-    M5.begin();
-    // 6軸センサ初期化
-    M5.MPU6886.Init();
-    M5.Lcd.setRotation(1); // ボタンBが上になる向き
-    M5.Lcd.fillScreen(BLACK);
+def create_BLE_server() {
+    BLEDevice::init("M5StickC"); // Initialize the BLE environment
 
-    Serial.begin(57600);
-
-    // Initialize the BLE environment
-    BLEDevice::init("M5StickC");
-
-    // Create the server
+    // create GATT
     BLEServer *pServer = BLEDevice::createServer();
-
-    // Create the service
     BLEService *pService = pServer->createService(ServiceUUID);
-
-    // Create the characteristic
     BLECharacteristic *pCharacteristic = pService->createCharacteristic(CharacteristicUUID, (uint32_t)'0x0011');
 
-    // setCallbacks
+    // setCallback function
     pCharacteristic->setCallbacks(new MyCallbackHandler());
-
-    // Set the characteristic value
-    pCharacteristic->setValue("Hello world");
 
     // Start the service
     pService->start();
@@ -53,15 +36,19 @@ void setup()
     // start Advertising
     BLEAdvertising *pAdvertising = pServer->getAdvertising();
     pAdvertising->start();
+
+}
+
+void setup()
+{
+    // Initialize the M5StickC object
+    M5.begin();
+    M5.Lcd.fillScreen(BLACK);
+    Serial.begin(57600);
+    create_BLE_server();
 }
 
 void loop()
 {
-    //   if (Serial.available()) {
-    //     SerialBT.write(Serial.read());
-    //   }
-    //   if (SerialBT.available()) {
-    //     Serial.write(SerialBT.read());
-    //   }
     delay(1000);
 }
