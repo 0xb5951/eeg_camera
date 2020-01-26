@@ -17,9 +17,13 @@ def get_device_data():
 
 def read_characterristics(pointer):
     data = peripheral.readCharacteristic(pointer)
-    print(str(pointer) + ":" + data)
+    # datas = peripheral.getCharacteristics(27,28)
+    print(str(pointer) + ":")
+    print(type(data))
+    print(data)
 
 
 if __name__ == "__main__":
-    for i in range(9, 25):
+    print('start:')
+    for i in range(8, 25):
         read_characterristics(i)
