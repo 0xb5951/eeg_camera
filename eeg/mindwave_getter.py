@@ -2,28 +2,38 @@
 import re
 import thinkgear as tg
 
+# 脳波を読み取って特定条件でフラグを返すクラス
+
 PORT = '/dev/rfcomm1'
 AT_THRESHOLD = 20
 
-def check_method(terget):
-    print type(terget)
-    for x in dir(terget):
-        print x
+class mindwave_wrapper(object):
+    def __init__(self):
+        self.tgp = tg.ThinkGearProtocol(PORT)
 
+    def get_packets(self):
+        return mindwave_obj.get_packets()
+        
 
-def check_attention(pkt_t):
-    flag = False
-    if pkt_t != '' and "ATTENTION" in pkt_t:
-        at_num = re.search(r'\d+', pkt_t)
-        print at_num.group()
-        if AT_THRESHOLD >= int(at_num.group()):
-            flag = True
-            
-    return flag
+    def check_attribute(self):
+        for attribute in dir(self.tgp):
+            print attribute
+    
+    def check_attention(self, pkt_t):
+        if pkt_t != '' and "ATTENTION" in pkt_t:
+            at_num = re.search(r'\d+', pkt_t)
+            return int(at_num.group())
+
+    def is_concentrate(self):
+    
+
+            if AT_THRESHOLD >= int(at_num.group()):
+                flag = True
+                
+        return flag
 
 
 if __name__ == "__main__":
-    # check_method(thinkgear)
     mindwave_obj = tg.ThinkGearProtocol(PORT)
     shatter_flag = 0
 
