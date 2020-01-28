@@ -23,6 +23,30 @@ jpeg_data_t jpeg_data;
 static const int RX_BUF_SIZE = 20000;
 static const uint8_t packet_begin[3] = { 0xFF, 0xD8, 0xEA };
    
+void get_image_data()
+{
+    if (serial_ext.available()) {
+    uint8_t rx_buffer[10];
+    int rx_size = serial_ext.readBytes(rx_buffer, 10);
+    if (rx_size == 10) {
+      // スタートパケットが一致したら
+
+      if ((rx_buffer[0] == packet_begin[0]) && (rx_buffer[1] == packet_begin[1]) && (rx_buffer[2] == packet_begin[2])) {
+        //image size receive of packet_begin
+        jpeg_data.length = (uint32_t)(rx_buffer[4] << 16) | (rx_buffer[5] << 8) | rx_buffer[6];
+        int rx_size = serial_ext.readBytes(jpeg_data.buf, jpeg_data.length);
+        // 画像の中身 : jpeg_data.buf
+        // 画像のサイズ : jpeg_data.length
+
+        send_slack(jpeg_data.buf, jpeg_data.length);
+        Serial.println("Captured!!");
+      }
+    }
+  }
+  // ちょっとロックをかける
+  vTaskDelay(10 / portTICK_RATE_MS);
+}
+
 void setup() {
   // Initialize the M5StickC object
   M5.begin();
@@ -46,24 +70,5 @@ void setup() {
 void loop() {
   M5.update();
 
-  if (serial_ext.available()) {
-    uint8_t rx_buffer[10];
-    int rx_size = serial_ext.readBytes(rx_buffer, 10);
-    if (rx_size == 10) {
-      // スタートパケットが一致したら
 
-      if ((rx_buffer[0] == packet_begin[0]) && (rx_buffer[1] == packet_begin[1]) && (rx_buffer[2] == packet_begin[2])) {
-        //image size receive of packet_begin
-        jpeg_data.length = (uint32_t)(rx_buffer[4] << 16) | (rx_buffer[5] << 8) | rx_buffer[6];
-        int rx_size = serial_ext.readBytes(jpeg_data.buf, jpeg_data.length);
-        // 画像の中身 : jpeg_data.buf
-        // 画像のサイズ : jpeg_data.length
-
-        send_slack(jpeg_data.buf, jpeg_data.length);
-        Serial.println("Captured!!");
-      }
-    }
-  }
-  // ちょっとロックをかける
-  vTaskDelay(10 / portTICK_RATE_MS);
 }
