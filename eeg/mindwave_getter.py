@@ -2,39 +2,46 @@
 import re
 import thinkgear as tg
 
-# 脳波を読み取って特定条件でフラグを返すクラス
-
 PORT = '/dev/rfcomm1'
-AT_THRESHOLD = 20
 
-class mindwave_wrapper(object):
-    def __init__(self):
-        self.tgp = tg.ThinkGearProtocol(PORT)
-
-    def get_packets(self):
-        return mindwave_obj.get_packets()
-        
-
-    def check_attribute(self):
-        for attribute in dir(self.tgp):
-            print attribute
+class EEG:
+    def __init__(self, PORT):
+        self.tg_device = tg.ThinkGearProtocol(PORT)
+        self.AT_THRESHOLD = 90
     
-    def check_attention(self, pkt_t):
+    def get_packets(self):
+        return self.tg_device.get_packets()
+    
+    def attention_data(self, pkt_t: str):
         if pkt_t != '' and "ATTENTION" in pkt_t:
             at_num = re.search(r'\d+', pkt_t)
-            return int(at_num.group())
-
-    def is_concentrate(self):
+            return at_num.group()
     
-
-            if AT_THRESHOLD >= int(at_num.group()):
-                flag = True
-                
+    def is_concentrate(self, attention_val: int):
+        flag = False
+        if self.AT_THRESHOLD >= int(attention_val):
+            flag = True
         return flag
+
+    def check_method(self):
+        print type(self.tg_device)
+        for x in dir(self.tg_device):
+            print x
+
+
+def check_attention(pkt_t):
+    flag = False
+    if pkt_t != '' and "ATTENTION" in pkt_t:
+        at_num = re.search(r'\d+', pkt_t)
+        print at_num.group()
+        if AT_THRESHOLD >= int(at_num.group()):
+            flag = True
+            
+    return flag
 
 
 if __name__ == "__main__":
-    mindwave_obj = tg.ThinkGearProtocol(PORT)
+    mindwave_obj = EEG(PORT)
     shatter_flag = 0
 
     for packets in mindwave_obj.get_packets():
@@ -42,7 +49,7 @@ if __name__ == "__main__":
             if isinstance(pkt, tg.ThinkGearRawWaveData):
                 continue
 
-            if check_attention(str(pkt)) and shatter_flag == 0:
+            if mindwave_obj.check_attention(str(pkt)) and shatter_flag == 0:
                 print 'kacha'
                 shatter_flag = 1
                 # ここで写真取る
