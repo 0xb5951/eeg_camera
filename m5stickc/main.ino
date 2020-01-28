@@ -4,6 +4,14 @@
 #include <ssl_client.h>
 #include <WiFiClientSecure.h>
 
+// デバイス初期化
+// BLEserverを作成
+// wifiに接続
+// write命令を受け取る
+// M5StickVに受信信号を送る
+// M5StickVから画像情報を受け取る
+// slackとかに送信
+
 HardwareSerial serial_ext(2);
 
 typedef struct {
@@ -20,11 +28,11 @@ void setup() {
   M5.begin();
   // 6軸センサ初期化
   M5.MPU6886.Init();
-  
   M5.Lcd.setRotation(1);  // ボタンBが上になる向き
   M5.Lcd.fillScreen(BLACK);
 
   setup_wifi();
+  create_BLE_server();
 
   jpeg_data.buf = (uint8_t *) malloc(sizeof(uint8_t) * RX_BUF_SIZE);
   jpeg_data.length = 0;
@@ -58,16 +66,4 @@ void loop() {
   }
   // ちょっとロックをかける
   vTaskDelay(10 / portTICK_RATE_MS);
-}
-
-void setup_wifi() {
-  const char* ssid = get_ssid();
-  const char* passwd = get_passwd();
-  M5.Lcd.printf("ssid : %s", ssid);
-  WiFi.begin(ssid, passwd);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  M5.Lcd.printf("WiFi connected");
 }
