@@ -5,21 +5,23 @@ import thinkgear as tg
 PORT = '/dev/rfcomm1'
 
 class EEG:
-    def __init__(self, PORT):
+    def __init__(self):
         self.tg_device = tg.ThinkGearProtocol(PORT)
         self.AT_THRESHOLD = 90
     
     def get_packets(self):
         return self.tg_device.get_packets()
     
-    def attention_data(self, pkt_t: str):
+    def attention_data(self, pkt_t):
         if pkt_t != '' and "ATTENTION" in pkt_t:
             at_num = re.search(r'\d+', pkt_t)
+            print at_num.group()
             return at_num.group()
-    
-    def is_concentrate(self, attention_val: int):
+        return 0
+
+    def is_concentrate(self, attention_val):
         flag = False
-        if self.AT_THRESHOLD >= int(attention_val):
+        if self.AT_THRESHOLD <= int(attention_val):
             flag = True
         return flag
 
@@ -27,21 +29,32 @@ class EEG:
         print type(self.tg_device)
         for x in dir(self.tg_device):
             print x
+    
+    def is_instance(self, pkt):
+        if isinstance(pkt, tg.ThinkGearRawWaveData):
+            return True
+        else:
+            return False
 
 
-def check_attention(pkt_t):
-    flag = False
-    if pkt_t != '' and "ATTENTION" in pkt_t:
-        at_num = re.search(r'\d+', pkt_t)
-        print at_num.group()
-        if AT_THRESHOLD >= int(at_num.group()):
-            flag = True
-            
-    return flag
+    def check_attention(self, pkt_t):
+        attention_val = self.attention_data(pkt_t)
+        return self.is_concentrate(attention_val)
+
+
+# def check_attention(self, pkt_t):
+#     flag = False
+#     if pkt_t != '' and "ATTENTION" in pkt_t:
+#         at_num = re.search(r'\d+', pkt_t)
+#         # print at_num.group()
+#         if self.AT_THRESHOLD >= int(attention_val):
+#             flag = True
+#     return flag
+
 
 
 if __name__ == "__main__":
-    mindwave_obj = EEG(PORT)
+    mindwave_obj = tg.ThinkGearProtocol(PORT)
     shatter_flag = 0
 
     for packets in mindwave_obj.get_packets():
@@ -49,7 +62,7 @@ if __name__ == "__main__":
             if isinstance(pkt, tg.ThinkGearRawWaveData):
                 continue
 
-            if mindwave_obj.check_attention(str(pkt)) and shatter_flag == 0:
+            if check_attention(str(pkt)) and shatter_flag == 0:
                 print 'kacha'
                 shatter_flag = 1
                 # ここで写真取る
