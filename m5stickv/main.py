@@ -29,10 +29,10 @@ fm.register(board_info.BUTTON_A, fm.fpioa.GPIO5, force=True)
 #M5StickV main button
 main_button = GPIO(GPIO.GPIO5, GPIO.IN, GPIO.PULL_UP)
 uart_Port = UART(UART.UART2, 115200,8,0,0, timeout=1000, read_buf_len= 4096)
-
+receive_data = ''
 while True:
     img = sensor.snapshot()
-    if main_button.value() == 0:
+    if receive_data == b'kacha':
         lcd.display(img)
         img_buf = img.compress(quality=70)
         # スタートビット
@@ -45,9 +45,8 @@ while True:
         uart_Port.write(img_buf)
         print('send uart')
         time.sleep(1)
-
-# Send UART End
-#uart_Port.deinit()
-#del uart_Port
-#print("finish")
+    #receive data from stickc
+    receive_data = uart_Port.read()
+    print(receive_data)
+    time.sleep(1)
 

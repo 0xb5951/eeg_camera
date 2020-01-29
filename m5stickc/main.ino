@@ -55,7 +55,7 @@ void setup() {
   M5.Lcd.setRotation(1);  // ボタンBが上になる向き
   M5.Lcd.fillScreen(BLACK);
 
-  setup_wifi();
+  wifi_setup();
   create_BLE_server();
 
   jpeg_data.buf = (uint8_t *) malloc(sizeof(uint8_t) * RX_BUF_SIZE);
@@ -69,6 +69,5 @@ void setup() {
 
 void loop() {
   M5.update();
-
-
+  get_image_data();
 }

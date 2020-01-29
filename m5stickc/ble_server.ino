@@ -13,13 +13,14 @@ class MyCallbackHandler: public BLECharacteristicCallbacks {
   }
 
   void onWrite(BLECharacteristic *pCharacteristic) {
-    M5.Lcd.println("write");
+    // ここで写真取る命令をM5StickVに送る
+    Serial.println("write");
     std::string value = pCharacteristic->getValue();
-    M5.Lcd.println(value.c_str());
+    serial_ext.write(value.c_str()); // stickVに送信
   }
 };
 
-def create_BLE_server() {
+void create_BLE_server() {
     BLEDevice::init("M5StickC"); // Initialize the BLE environment
 
     // create GATT
@@ -37,18 +38,4 @@ def create_BLE_server() {
     BLEAdvertising *pAdvertising = pServer->getAdvertising();
     pAdvertising->start();
 
-}
-
-void setup()
-{
-    // Initialize the M5StickC object
-    M5.begin();
-    M5.Lcd.fillScreen(BLACK);
-    Serial.begin(57600);
-    create_BLE_server();
-}
-
-void loop()
-{
-    delay(1000);
 }

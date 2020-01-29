@@ -7,7 +7,7 @@ PORT = '/dev/rfcomm1'
 class EEG:
     def __init__(self):
         self.tg_device = tg.ThinkGearProtocol(PORT)
-        self.AT_THRESHOLD = 90
+        self.AT_THRESHOLD = 80
     
     def get_packets(self):
         return self.tg_device.get_packets()
@@ -40,17 +40,6 @@ class EEG:
     def check_attention(self, pkt_t):
         attention_val = self.attention_data(pkt_t)
         return self.is_concentrate(attention_val)
-
-
-# def check_attention(self, pkt_t):
-#     flag = False
-#     if pkt_t != '' and "ATTENTION" in pkt_t:
-#         at_num = re.search(r'\d+', pkt_t)
-#         # print at_num.group()
-#         if self.AT_THRESHOLD >= int(attention_val):
-#             flag = True
-#     return flag
-
 
 
 if __name__ == "__main__":
