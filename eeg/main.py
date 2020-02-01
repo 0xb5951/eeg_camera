@@ -1,6 +1,8 @@
 # coding:utf-8
 import ble_device
-import mindwave
+from mindwave import is_attention, check_method
+import thinkgear as tg
+
 
 if __name__ == "__main__":
     PORT = '/dev/rfcomm1' # mindwaveの接続デバイス
@@ -9,17 +11,20 @@ if __name__ == "__main__":
 
     m5Stickc = ble_device.Peripheral(MAC_ADDRESS)
 
-    mindwave_obj = mindwave.EEG()
+    mindwave_obj = tg.ThinkGearProtocol(PORT)
     shatter_flag = 0
 
     for packets in mindwave_obj.get_packets():
         for pkt in packets:
-            if mindwave_obj.is_instance(pkt):
+            if isinstance(pkt, tg.ThinkGearRawWaveData):
                 continue
-            if mindwave_obj.check_attention(str(pkt)) and shatter_flag == 0:
-                print 'kacha'
+
+            print get_attention_data(pkt)
+            if is_attention(str(pkt)) and shatter_flag == 0:
+                print 'Click!'
                 shatter_flag = 1
                 # send write signal to m5stickc
-                m5Stickc.write_characterristics(42, "kacha")
+                m5Stickc.write_characterristics(42, "Click!")
             else:
                 shatter_flag = 0
+                m5Stickc.write_characterristics(42, get_attention_data(pkt))
