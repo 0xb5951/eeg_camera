@@ -16,7 +16,11 @@ class MyCallbackHandler: public BLECharacteristicCallbacks {
     // ここで写真取る命令をM5StickVに送る
     Serial.println("write");
     std::string value = pCharacteristic->getValue();
-    serial_ext.write(value.c_str()); // stickVに送信
+    M5.Lcd.setCursor(0, 30);
+    M5.Lcd.printf(value.c_str());
+    if (strcmp(value.c_str(), "Click!") == 0) {
+      serial_ext.write(value.c_str()); // stickVに送信
+    }
   }
 };
 

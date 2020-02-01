@@ -1,6 +1,6 @@
 # coding:utf-8
 import ble_device
-from mindwave import is_attention, check_method
+from mindwave import is_attention, check_method, get_attention_data
 import thinkgear as tg
 
 
@@ -19,12 +19,15 @@ if __name__ == "__main__":
             if isinstance(pkt, tg.ThinkGearRawWaveData):
                 continue
 
-            print get_attention_data(pkt)
+            print get_attention_data(str(pkt))
+
             if is_attention(str(pkt)) and shatter_flag == 0:
                 print 'Click!'
                 shatter_flag = 1
                 # send write signal to m5stickc
                 m5Stickc.write_characterristics(42, "Click!")
-            else:
+            elif get_attention_data(str(pkt)) != 0:
                 shatter_flag = 0
-                m5Stickc.write_characterristics(42, get_attention_data(pkt))
+                m5Stickc.write_characterristics(42, get_attention_data(str(pkt)))
+
+                

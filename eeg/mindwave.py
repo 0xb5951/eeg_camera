@@ -3,15 +3,16 @@ import re
 import thinkgear as tg
 
 PORT = '/dev/rfcomm1'
-    
-def check_method(self):
-    print type(self.tg_device)
-    for x in dir(self.tg_device):
+AT_THRESHOLD = 80
+
+def check_method():
+    print type(tg_device)
+    for x in dir(tg_device):
         print x
 
 def is_attention(pkt_t):
     flag = False
-    if self.AT_THRESHOLD <= int(get_attention_data(pkt_t)):
+    if AT_THRESHOLD <= int(get_attention_data(pkt_t)):
         flag = True
     return flag
 
@@ -30,6 +31,7 @@ if __name__ == "__main__":
             if isinstance(pkt, tg.ThinkGearRawWaveData):
                 continue
 
+            print(get_attention_data(str(pkt)))
             if is_attention(str(pkt)) and shatter_flag == 0:
                 print 'kacha'
                 shatter_flag = 1
