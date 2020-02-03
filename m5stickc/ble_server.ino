@@ -17,12 +17,20 @@ class MyCallbackHandler: public BLECharacteristicCallbacks {
     // ここで写真取る命令をM5StickVに送る
     Serial.println("write");
     std::string value = pCharacteristic->getValue();
-    M5.Lcd.setCursor(0, 30);
+    M5.Lcd.setTextSize(3);
+    M5.Lcd.setCursor(65, 45);
     M5.Lcd.printf(value.c_str());
     if (strcmp(value.c_str(), "Click!") == 0) {
-      M5.Lcd.fillScreen(RED);
+      M5.Lcd.fillScreen(WHITE);
       serial_ext.write(value.c_str()); // stickVに送信
+      delay(50);
       M5.Lcd.fillScreen(BLACK);
+      M5.Lcd.setTextSize(2);
+      M5.Lcd.setCursor(2, 2);
+      M5.Lcd.printf("Attention Num");
+      M5.Lcd.setTextSize(1.5);
+      M5.Lcd.setCursor(40, 22);
+      M5.Lcd.printf("Threshold : 80");
     }
   }
 };
