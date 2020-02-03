@@ -65,6 +65,8 @@ void setup() {
   }
 
   serial_ext.begin(115200, SERIAL_8N1, 32, 33);
+  M5.Lcd.fillScreen(BLACK);
+  M5.Lcd.setTextSize(2.5);
 }
 
 void loop() {

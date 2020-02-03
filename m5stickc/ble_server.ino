@@ -1,5 +1,6 @@
 #include <M5StickC.h>
 #include "BLEDevice.h"
+#define TFT_RED         0xF800      /* 255,   0,   0 */
 
 // 自由に設定してよい。以下でランダムなUUIDを生成してくれる。
 // https://www.uuidgenerator.net
@@ -19,7 +20,9 @@ class MyCallbackHandler: public BLECharacteristicCallbacks {
     M5.Lcd.setCursor(0, 30);
     M5.Lcd.printf(value.c_str());
     if (strcmp(value.c_str(), "Click!") == 0) {
+      M5.Lcd.fillScreen(RED);
       serial_ext.write(value.c_str()); // stickVに送信
+      M5.Lcd.fillScreen(BLACK);
     }
   }
 };
