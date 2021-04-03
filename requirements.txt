@@ -3,7 +3,7 @@ future==0.18.2
 iso8601==0.1.12
 PyBluez==0.21
 pyserial==3.4
-PyYAML==5.3
+PyYAML==5.4
 serial==0.0.97
 thinkgear==0.2
 virtualenv==16.7.9
